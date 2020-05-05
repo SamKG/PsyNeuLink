@@ -4107,6 +4107,7 @@ class TestSchedulerConditions:
                               (pnl.Always, [[0.05, 0.05]]),
                               #(pnl.AtPass, [[.3, .3]]), #FIXME: Differing result between llvm and python
                               (pnl.AtTrial,[[0.05, 0.05]]),
+                              (pnl.AfterNTrials,[[0.05, 0.05]]),
                               #(pnl.Never), #TODO: Find a good test case for this!
                             ])
     def test_scheduler_conditions(self, mode, condition, expected_result):
@@ -4152,6 +4153,8 @@ class TestSchedulerConditions:
         elif condition is pnl.AtPass:
             comp.scheduler.add_condition(response, condition(5))
         elif condition is pnl.AtTrial:
+            comp.scheduler.add_condition(response, condition(0))
+        elif condition is pnl.AfterNTrials:
             comp.scheduler.add_condition(response, condition(0))
 
         result = comp.run([0.05], bin_execute=mode)

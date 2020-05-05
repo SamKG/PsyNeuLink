@@ -354,7 +354,7 @@ class ConditionGenerator:
 
     def generate_sched_condition(self, builder, condition, cond_ptr, node, is_finished_flag_locs):
 
-        from psyneulink.core.scheduling.condition import All, Any, AllHaveRun, Always, AtPass, AtTrial, EveryNCalls, BeforeNCalls, AtNCalls, AfterNCalls, Never, Not, WhenFinished, WhenFinishedAny, WhenFinishedAll
+        from psyneulink.core.scheduling.condition import All, Any, AllHaveRun, Always, AtPass, AtTrial, AfterTrial, AfterNTrials, EveryNCalls, BeforeNCalls, AtNCalls, AfterNCalls, Never, Not, WhenFinished, WhenFinishedAny, WhenFinishedAll
 
         if isinstance(condition, Always):
             return ir.IntType(1)(1)
@@ -399,6 +399,13 @@ class ConditionGenerator:
             ts = builder.load(ts_ptr)
             trial = builder.extract_value(ts, 0)
             return builder.icmp_unsigned("==", trial, trial.type(trial_num))
+
+        elif isinstance(condition, AfterNTrials):
+            trial_num = condition.args[0]
+            ts_ptr = builder.gep(cond_ptr, [self._zero, self._zero, self._zero])
+            ts = builder.load(ts_ptr)
+            trial = builder.extract_value(ts, 0)
+            return builder.icmp_unsigned(">=", trial, trial.type(trial_num))
 
         elif isinstance(condition, AtPass):
             pass_num = condition.args[0]
