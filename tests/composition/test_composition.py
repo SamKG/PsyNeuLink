@@ -4098,6 +4098,7 @@ class TestSchedulerConditions:
                               (pnl.AtNCalls, [[.25, .25]]),
                               (pnl.AfterCall, [[.3, .3]]),
                               (pnl.AfterNCalls, [[.25, .25]]),
+                              (pnl.AfterNCallsCombined, [[.25, .25]]),
                               (pnl.WhenFinished, [[1.0, 1.0]]),
                               (pnl.WhenFinishedAny, [[1.0, 1.0]]),
                               (pnl.WhenFinishedAll, [[1.0, 1.0]]),
@@ -4137,6 +4138,8 @@ class TestSchedulerConditions:
             comp.scheduler.add_condition(response, condition(decisionMaker, 5))
         elif condition is pnl.AfterNCalls:
             comp.scheduler.add_condition(response, condition(decisionMaker, 5))
+        elif condition is pnl.AfterNCallsCombined:
+            comp.scheduler.add_condition(response, condition(decisionMaker, n=5))
         elif condition is pnl.WhenFinished:
             comp.scheduler.add_condition(response, condition(decisionMaker))
         elif condition is pnl.WhenFinishedAny:
