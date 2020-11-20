@@ -897,6 +897,8 @@ def gen_composition_run(ctx, composition, *, tags:frozenset):
     cond_init = cond_type(cond_gen.get_condition_initializer())
     builder.store(cond_init, cond)
 
+    loop_state = builder.alloca(state.type.pointee)
+    builder.store(builder.load(state), loop_state)
     runs = builder.load(runs_ptr, "runs")
     with helpers.for_loop_zero_inc(builder, runs, "run_loop") as (b, iters):
         # Get the right input stimulus
@@ -905,7 +907,7 @@ def gen_composition_run(ctx, composition, *, tags:frozenset):
 
         # Reset internal clocks of each node
         for idx, node in enumerate(composition._all_nodes):
-            node_state = builder.gep(state, [ctx.int32_ty(0), ctx.int32_ty(0), ctx.int32_ty(idx)])
+            node_state = builder.gep(loop_state, [ctx.int32_ty(0), ctx.int32_ty(0), ctx.int32_ty(idx)])
             num_executions_ptr = helpers.get_state_ptr(builder, node, node_state, "num_executions")
             num_exec_time_ptr = builder.gep(num_executions_ptr, [ctx.int32_ty(0), ctx.int32_ty(TimeScale.RUN.value)])
             builder.store(num_exec_time_ptr.type.pointee(0), num_exec_time_ptr)
@@ -913,7 +915,7 @@ def gen_composition_run(ctx, composition, *, tags:frozenset):
         # Call execution
         exec_tags = tags.difference({"run"})
         exec_f = ctx.import_llvm_function(composition, tags=exec_tags)
-        b.call(exec_f, [state, params, data_in_ptr, data, cond])
+        b.call(exec_f, [loop_state, params, data_in_ptr, data, cond])
 
         if not simulation:
             # Extract output_CIM result

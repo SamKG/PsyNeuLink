@@ -168,6 +168,7 @@ class LLVMBuilderContext:
             self._stats["cache_misses"] += 1
             with self:
                 obj_cache[tags] = obj._gen_llvm_function(ctx=self, tags=tags)
+                obj_cache[tags].attributes.add('alwaysinline')
         return obj_cache[tags]
 
     def import_llvm_function(self, fun, *, tags:frozenset=frozenset()) -> ir.Function:

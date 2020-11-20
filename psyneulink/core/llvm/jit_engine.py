@@ -70,7 +70,8 @@ def _cpu_jit_constructor():
     __pass_manager_builder = binding.PassManagerBuilder()
     __pass_manager_builder.loop_vectorize = True
     __pass_manager_builder.slp_vectorize = True
-    __pass_manager_builder.opt_level = 2
+    __pass_manager_builder.opt_level = 3
+    __pass_manager_builder.inlining_threshold = int(1E10)
 
     __cpu_features = binding.get_host_cpu_features().flatten()
     __cpu_name = binding.get_host_cpu_name()
